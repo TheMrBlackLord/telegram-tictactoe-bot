@@ -1,0 +1,32 @@
+{
+   "name": "tg_tic_tac_toe",
+   "version": "1.0.0",
+   "description": "Telegram bot game Tic Tac Toe",
+   "main": "index.js",
+   "scripts": {},
+   "keywords": [
+      "telegram",
+      "bot",
+      "tictactoe"
+   ],
+   "author": "MrBlackLord",
+   "license": "ISC",
+   "devDependencies": {
+      "@types/dotenv": "^8.2.0",
+      "@types/node": "^20.5.0",
+      "@typescript-eslint/eslint-plugin": "^6.4.0",
+      "@typescript-eslint/parser": "^6.4.0",
+      "eslint": "^8.47.0",
+      "eslint-config-prettier": "^9.0.0",
+      "eslint-plugin-import": "^2.28.0",
+      "eslint-plugin-prettier": "^5.0.0",
+      "prettier": "^3.0.2",
+      "typescript": "^5.1.6"
+   },
+   "dependencies": {
+      "dotenv": "^16.3.1",
+      "inversify": "^6.0.1",
+      "reflect-metadata": "^0.1.13",
+      "telegraf": "^4.12.2"
+   }
+}
