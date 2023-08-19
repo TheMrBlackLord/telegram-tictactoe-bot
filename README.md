@@ -1,3 +1,3 @@
 # Telegram Tic Tac Toe bot
 
-## Typescript, Telegraf.js
+### Typescript, Telegraf.js
