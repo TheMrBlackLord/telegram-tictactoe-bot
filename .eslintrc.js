@@ -20,7 +20,7 @@ module.exports = {
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-empty-function': 'warn',
-      '@typescript-eslint/naming-convention': 'warn',
+      '@typescript-eslint/naming-convention': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       'curly': 'off',
       'no-throw-literal': 'warn',

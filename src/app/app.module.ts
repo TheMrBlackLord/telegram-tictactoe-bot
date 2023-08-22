@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import path from 'path';
 import { TelegrafModule, TelegrafModuleOptions } from 'nestjs-telegraf';
+import RedisSession from 'telegraf-session-redis';
+import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
+import { UserModule } from 'src/user/user.module';
 
 const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
 
@@ -13,14 +16,31 @@ const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
          envFilePath,
          isGlobal: true
       }),
+      MongooseModule.forRootAsync({
+         imports: [ConfigModule],
+         inject: [ConfigService],
+         useFactory(configService: ConfigService): MongooseModuleOptions {
+            const uri = configService.getOrThrow<string>('MONGO_URI');
+            const dbName = configService.getOrThrow<string>('MONGO_DB_NAME');
+            return { uri, dbName };
+         }
+      }),
       TelegrafModule.forRootAsync({
          imports: [ConfigModule],
          inject: [ConfigService],
          useFactory(configService: ConfigService): TelegrafModuleOptions {
             const token = configService.getOrThrow<string>('BOT_TOKEN');
-            return { token };
+            const session = new RedisSession({
+               store: {
+                  host: configService.getOrThrow<string>('REDIS_HOST'),
+                  port: configService.getOrThrow<number>('REDIS_PORT'),
+                  password: configService.get<string>('REDIS_PASSWORD') || ''
+               }
+            });
+            return { token, middlewares: [session] };
          }
-      })
+      }),
+      UserModule
    ],
    providers: [AppService, AppUpdate]
 })

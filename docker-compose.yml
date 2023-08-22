@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - 8000:27017
+    volumes:
+      - tgTtT_mongo:/data/db
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+    command: /bin/sh -c "redis-server --requirepass redispassword"
+    ports:
+      - 6379:6379
+    volumes:
+      - tgTtT_redis:/data
+
+volumes:
+  tgTtT_mongo:
+  tgTtT_redis:
