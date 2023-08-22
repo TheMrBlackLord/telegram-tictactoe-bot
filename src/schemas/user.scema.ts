@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Language } from 'src/types/language.type';
+import { Language } from '../types/language.type';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -17,6 +17,24 @@ export class User {
       unique: true
    })
    tgID: number;
+
+   @Prop({
+      default: 0,
+      required: true
+   })
+   wins: number;
+
+   @Prop({
+      default: 0,
+      required: true
+   })
+   defeats: number;
+
+   @Prop({
+      default: 0,
+      required: true
+   })
+   draws: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

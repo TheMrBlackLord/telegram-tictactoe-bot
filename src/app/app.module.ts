@@ -6,7 +6,7 @@ import path from 'path';
 import { TelegrafModule, TelegrafModuleOptions } from 'nestjs-telegraf';
 import RedisSession from 'telegraf-session-redis';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
 
 const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
 

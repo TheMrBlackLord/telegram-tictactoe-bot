@@ -1,12 +1,18 @@
-import { Update, Start, Ctx, Action } from 'nestjs-telegraf';
-import startButtons from '../buttons/start.buttons';
-import { CHANGE_LANGUAGE, ENG_LANG, RUS_LANG } from 'src/constants/actions.constants';
-import languageButtons from 'src/buttons/language.buttons';
-import { TelegrafContext, TelegrafContextCallbackDataQuery } from 'src/context';
-import { UserService } from 'src/user/user.service';
-import { languageGuard } from 'src/utils/guards.util';
-import { LOCALE } from 'src/locale';
-import { Language } from 'src/types/language.type';
+import { Update, Start, Ctx, Action, Command } from 'nestjs-telegraf';
+import menuButtons from '../buttons/menu.buttons';
+import {
+   CHANGE_LANGUAGE_ACTION,
+   ENG_LANG,
+   MY_STATS_ACTION,
+   RUS_LANG
+} from '../constants/actions.constants';
+import languageButtons from '../buttons/language.buttons';
+import { TelegrafContext, TelegrafContextCallbackDataQuery } from '../context';
+import { UserService } from '../user/user.service';
+import { languageGuard } from '../utils/guards.util';
+import { LOCALE } from '../locale';
+import { Language } from '../types/language.type';
+import { MENU_COMMAND } from '../constants/commands.constants';
 
 @Update()
 export class AppUpdate {
@@ -21,11 +27,36 @@ export class AppUpdate {
          `👋 ${LOCALE[ctx.session.language].hello[0]} ${ctx.from.first_name ?? ''}, ${
             LOCALE[ctx.session.language].hello[1]
          } ${ctx.botInfo.first_name}`,
-         startButtons(user.language)
+         menuButtons(user.language)
       );
    }
 
-   @Action(CHANGE_LANGUAGE)
+   @Command(MENU_COMMAND)
+   async menuCommandHandler(@Ctx() ctx: TelegrafContext) {
+      await ctx.reply(
+         `🔽 ${LOCALE[ctx.session.language].menu}`,
+         menuButtons(ctx.session.language)
+      );
+   }
+   @Action(MY_STATS_ACTION)
+   async showUserStats(@Ctx() ctx: TelegrafContext) {
+      const stats = await this.userService.getUserStats(ctx.from.id);
+      if (!stats) {
+         return await ctx.answerCbQuery(`${LOCALE[ctx.session.language].somethingWrong}`);
+      }
+      await ctx.reply(
+         `🎲 ${LOCALE[ctx.session.language].totalGamesCount}: ${
+            stats.totalGamesCount
+         }\n🎖 ${LOCALE[ctx.session.language].winPercentage}: ${
+            stats.winPercentage + '%'
+         }\n\n🏆 ${LOCALE[ctx.session.language].wins}: ${stats.wins}\n❌ ${
+            LOCALE[ctx.session.language].defeats
+         }: ${stats.defeats}\n⚖️ ${LOCALE[ctx.session.language].draws}: ${stats.draws}`
+      );
+      await ctx.answerCbQuery();
+   }
+
+   @Action(CHANGE_LANGUAGE_ACTION)
    async chooseLanguageHandler(@Ctx() ctx: TelegrafContext) {
       await ctx.reply(
          `🔽 ${LOCALE[ctx.session.language].chooseLanguage}`,

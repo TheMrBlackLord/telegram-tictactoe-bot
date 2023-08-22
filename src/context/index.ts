@@ -1,4 +1,4 @@
-import { Language } from 'src/types/language.type';
+import { Language } from '../types/language.type';
 import { Context } from 'telegraf';
 import { Update, CallbackQuery } from 'telegraf/typings/core/types/typegram';
 
