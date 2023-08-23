@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppUpdate } from './app.update';
-import { AppService } from './app.service';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import path from 'path';
 import { TelegrafModule, TelegrafModuleOptions } from 'nestjs-telegraf';
@@ -42,7 +41,7 @@ const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
       }),
       UserModule
    ],
-   providers: [AppService, AppUpdate]
+   providers: [AppUpdate]
 })
 export class AppModule {
    static port: string | number;
