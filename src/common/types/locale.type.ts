@@ -10,7 +10,11 @@ export type LocaleLanguage = {
    wins: string;
    defeats: string;
    draws: string;
+   playMenuChoice: string;
+   cancel: string;
+   pleaseSendGameID: string;
 
+   buttonNewGame: string;
    buttonMyStats: string;
    buttonPlay: string;
    buttonChangeLang: string;

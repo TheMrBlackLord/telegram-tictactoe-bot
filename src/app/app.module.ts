@@ -6,6 +6,7 @@ import { TelegrafModule, TelegrafModuleOptions } from 'nestjs-telegraf';
 import RedisSession from 'telegraf-session-redis';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { UserModule } from '../user/user.module';
+import { PlayMenuScene } from '../scenes/playMenu.scene';
 
 const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
 
@@ -41,7 +42,7 @@ const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
       }),
       UserModule
    ],
-   providers: [AppUpdate]
+   providers: [AppUpdate, PlayMenuScene]
 })
 export class AppModule {
    static port: string | number;

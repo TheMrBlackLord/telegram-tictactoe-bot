@@ -1,12 +1,14 @@
-import { Language } from '../types/language.type';
-import { Context } from 'telegraf';
-import { Update, CallbackQuery } from 'telegraf/typings/core/types/typegram';
+import { Scenes } from 'telegraf';
+import { Language } from '../types';
+import { SceneSessionData } from 'telegraf/typings/scenes';
+import { CallbackQuery, Update } from 'telegraf/typings/core/types/typegram';
 
-export interface TelegrafContext extends Context {
+export interface TelegrafContext extends Scenes.SceneContext {
    session: {
       language: Language;
+      __scenes: SceneSessionData;
    };
 }
-export interface TelegrafContextCallbackDataQuery extends TelegrafContext {
+export interface TelegrafContextCallbackQuery extends TelegrafContext {
    update: Update.CallbackQueryUpdate<CallbackQuery.DataQuery>;
 }

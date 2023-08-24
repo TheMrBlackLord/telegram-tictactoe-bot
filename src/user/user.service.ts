@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../schemas/user.scema';
-import { Language } from '../common/types/language.type';
-import { Stats } from '../common/types/stats.type';
+import { Language, Stats } from '../common/types';
 
 @Injectable()
 export class UserService {
