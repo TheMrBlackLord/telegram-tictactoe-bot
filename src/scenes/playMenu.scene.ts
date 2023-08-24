@@ -3,7 +3,6 @@ import { playMenuButtons } from '../common/buttons';
 import {
    PLAY_MENU_SCENE,
    GAME_ID_LENGTH,
-   GAME_SCENE,
    NEW_GAME_ACTION,
    CANCEL_PLAY_ACTION
 } from '../common/constants';
@@ -11,9 +10,12 @@ import { TelegrafContext } from '../common/context';
 import { Locale } from '../common/decorators';
 import { LocaleLanguage } from '../common/types';
 import { Message as TGMessage } from 'telegraf/typings/core/types/typegram';
+import { GameService } from '../game/game.service';
 
 @Scene(PLAY_MENU_SCENE)
 export class PlayMenuScene {
+   constructor(private readonly gameService: GameService) {}
+
    @SceneEnter()
    async onSceneEnter(@Ctx() ctx: TelegrafContext, @Locale() locale: LocaleLanguage) {
       await ctx.reply(
@@ -30,10 +32,21 @@ export class PlayMenuScene {
    ) {
       const id = Number(msg.text);
       if (msg.text.trim().length !== GAME_ID_LENGTH || !id) {
-         return await ctx.reply(`🙏 ${locale.pleaseSendGameID}`);
+         await ctx.reply(`🙏 ${locale.pleaseSendGameID}`);
+         return;
       }
-      ctx.scene.state['gameID'] = id;
-      ctx.scene.enter(GAME_SCENE);
+      const room = await this.gameService.enter(
+         ctx.from.id,
+         ctx.from.username,
+         ctx.from.first_name,
+         id
+      );
+      if (!room) {
+         await ctx.reply('bad');
+         return;
+      }
+      ctx.session.game = room;
+      await ctx.reply('good');
    }
 
    @On('message')
@@ -42,7 +55,18 @@ export class PlayMenuScene {
    }
 
    @Action(NEW_GAME_ACTION)
-   async newGameHandler() {}
+   async newGameHandler(@Ctx() ctx: TelegrafContext, @Locale() locale: LocaleLanguage) {
+      const room = await this.gameService.createAndEnter(
+         ctx.from.id,
+         ctx.from.username,
+         ctx.from.first_name
+      );
+      ctx.session.game = room;
+      await ctx.replyWithHTML(
+         `✅ ${locale.gameRoomCreated}: <strong>${room.gameID}</strong>`
+      );
+      await ctx.answerCbQuery();
+   }
 
    @Action(CANCEL_PLAY_ACTION)
    async cancelPlayHandler(@Ctx() ctx: TelegrafContext) {

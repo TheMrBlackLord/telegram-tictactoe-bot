@@ -1,4 +1,3 @@
-export type Opponents = {
-   x: string;
-   o: string;
-};
+import { Player } from './player.type';
+
+export type Opponents = [Player, Player];

@@ -13,6 +13,7 @@ export type LocaleLanguage = {
    playMenuChoice: string;
    cancel: string;
    pleaseSendGameID: string;
+   gameRoomCreated: string;
 
    buttonNewGame: string;
    buttonMyStats: string;

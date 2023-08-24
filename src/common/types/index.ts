@@ -6,3 +6,4 @@ export * from './move.type';
 export * from './cellCoord.type';
 export * from './opponents.type';
 export * from './chars.type';
+export * from './player.type';

@@ -23,7 +23,8 @@ export class Game {
    opponents: Opponents;
 
    @Prop({
-      required: true
+      required: true,
+      type: String
    })
    winner: Chars;
 

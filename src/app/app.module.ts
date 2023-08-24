@@ -7,6 +7,7 @@ import RedisSession from 'telegraf-session-redis';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { UserModule } from '../user/user.module';
 import { PlayMenuScene } from '../scenes/playMenu.scene';
+import { GameModule } from '../game/game.module';
 
 const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
 
@@ -40,7 +41,8 @@ const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
             return { token, middlewares: [session] };
          }
       }),
-      UserModule
+      UserModule,
+      GameModule
    ],
    providers: [AppUpdate, PlayMenuScene]
 })

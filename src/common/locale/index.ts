@@ -20,7 +20,8 @@ export const LOCALE: Record<Language, LocaleLanguage> = {
          'You can start a new game by clicking the button below or write me the ID of an already created game',
       buttonNewGame: 'New game',
       cancel: 'Cancel',
-      pleaseSendGameID: 'Please send game id (7 digits)'
+      pleaseSendGameID: 'Please send game id (7 digits)',
+      gameRoomCreated: 'Ok. You can share game id with a friend to play together'
    },
    russian: {
       hello: ['Привет,', 'добро пожаловать в'],
@@ -41,6 +42,8 @@ export const LOCALE: Record<Language, LocaleLanguage> = {
          'Ты можешь начать новую игру, нажав кнопку ниже или написать мне айди уже созданной игры',
       buttonNewGame: 'Новая игра',
       cancel: 'Отмена',
-      pleaseSendGameID: 'Пожалуйста, отправь айди игры (7 цифр)'
+      pleaseSendGameID: 'Пожалуйста, отправь айди игры (7 цифр)',
+      gameRoomCreated:
+         'Хорошо. Ты можешь поделиться айди игры с другом, чтобы играть вместе'
    }
 };
