@@ -5,6 +5,7 @@ import { LOCALE } from '../locale';
 
 export const Locale = createParamDecorator((_, ctx: ExecutionContext) => {
    const language =
-      TelegrafExecutionContext.create(ctx).getContext<TelegrafContext>().session.language;
-   return LOCALE[language];
+      TelegrafExecutionContext.create(ctx).getContext<TelegrafContext>()?.session
+         ?.language;
+   return LOCALE[language || 'english'];
 });

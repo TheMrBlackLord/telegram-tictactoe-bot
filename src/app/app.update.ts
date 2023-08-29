@@ -1,5 +1,12 @@
-import { Update, Start, Ctx, Command, Action } from 'nestjs-telegraf';
-import { menuButtons, languageButtons } from '../common/buttons';
+import { Update, Start, Ctx, Command, Action, On } from 'nestjs-telegraf';
+import { InlineQueryResultArticle } from 'telegraf/typings/core/types/typegram';
+import {
+   menuButtons,
+   languageButtons,
+   acceptButton,
+   playChoiceButtons,
+   denyButton
+} from '../common/buttons';
 import {
    MENU_COMMAND,
    MY_STATS_ACTION,
@@ -8,7 +15,10 @@ import {
    RUS_LANG,
    PLAY_COMMAND,
    PLAY_ACTION,
-   PLAY_MENU_SCENE
+   INLINE_QUERY_ID,
+   THUMB_URL,
+   ACCEPT_CHALLENGE_ACTION,
+   DENY_CHALLENGE_ACTION
 } from '../common/constants';
 import { TelegrafContext, TelegrafContextCallbackQuery } from '../common/context';
 import { Locale } from '../common/decorators';
@@ -21,10 +31,17 @@ import {
    changeLangSuccessString
 } from '../common/utils';
 import { UserService } from '../user/user.service';
+import { Context } from 'telegraf';
+import { GameService } from '../game/game.service';
 
 @Update()
 export class AppUpdate {
-   constructor(private readonly userService: UserService) {}
+   constructor(
+      private readonly userService: UserService,
+      private readonly gameService: GameService
+   ) {}
+
+   // ========= COMMAND HANDLERS =========
 
    @Start()
    async startCommandHandler(@Ctx() ctx: TelegrafContext) {
@@ -42,6 +59,8 @@ export class AppUpdate {
       await ctx.reply(`🔽 ${locale.menu}`, menuButtons(ctx.session.language));
    }
 
+   // ========= ACTION HANDLERS =========
+
    @Action(MY_STATS_ACTION)
    async myStatsCommandHandler(
       @Ctx() ctx: TelegrafContext,
@@ -53,6 +72,30 @@ export class AppUpdate {
       }
       await ctx.reply(statsString(locale, stats));
       await ctx.answerCbQuery();
+   }
+
+   @Action(ACCEPT_CHALLENGE_ACTION)
+   async onAcceptChallenge(
+      @Ctx() ctx: TelegrafContextCallbackQuery
+      // @Locale() locale: LocaleLanguage
+   ) {
+      await ctx.reply('accepted');
+   }
+
+   @Action(DENY_CHALLENGE_ACTION)
+   async onDenyChallenge(@Ctx() ctx: Context) {
+      const language = await this.userService.getLanguage(ctx.from.id);
+      const result = await this.gameService.denyChallenge(
+         ctx.from.id,
+         ctx.inlineMessageId
+      );
+      if (typeof result === 'string') {
+         await ctx.answerCbQuery(LOCALE[language][result as string]);
+         return;
+      }
+
+      await ctx.answerCbQuery();
+      await ctx.editMessageText(`🤷‍♂️ ${LOCALE[result.language].challengeDenied}`);
    }
 
    @Action(CHANGE_LANGUAGE_ACTION)
@@ -79,12 +122,45 @@ export class AppUpdate {
       await ctx.deleteMessage();
    }
 
+   // ========= OTHER HANDLERS =========
+
    @Command(PLAY_COMMAND)
    @Action(PLAY_ACTION)
-   async playHandler(@Ctx() ctx: TelegrafContext) {
+   async playHandler(@Ctx() ctx: TelegrafContext, @Locale() locale: LocaleLanguage) {
       if (ctx.callbackQuery) {
          await ctx.answerCbQuery();
       }
-      await ctx.scene.enter(PLAY_MENU_SCENE);
+      await ctx.reply(
+         `🔽 ${locale.chooseGameOption}`,
+         playChoiceButtons(ctx.session.language)
+      );
+   }
+
+   @On('inline_query')
+   async onInlineQuery(@Ctx() ctx: Context) {
+      const language = await this.userService.getLanguage(
+         ctx.inlineQuery.from.id
+      );
+      const result: InlineQueryResultArticle = {
+         type: 'article',
+         id: INLINE_QUERY_ID,
+         title: `⚔️ ${LOCALE[language].inlineQueryTitle}`,
+         description: `${LOCALE[language].inlineQueryDescription}`,
+         thumb_url: THUMB_URL,
+         input_message_content: {
+            message_text: `⚔️ ${LOCALE[language].iChallengeU}`
+         },
+         reply_markup: {
+            inline_keyboard: [[acceptButton(language), denyButton(language)]]
+         }
+      };
+      ctx.answerInlineQuery([result], {
+         cache_time: 120
+      });
+   }
+
+   @On('chosen_inline_result')
+   async onNewChallenge(@Ctx() ctx: Context) {
+      await this.gameService.newChallenge(ctx.from, ctx.inlineMessageId);
    }
 }

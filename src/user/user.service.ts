@@ -8,6 +8,12 @@ import { Language, Stats } from '../common/types';
 export class UserService {
    constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+   async getLanguage(tgID: number): Promise<Language> {
+      const user = await this.userModel.findOne({ tgID });
+      if (!user) return 'english';
+      return user.language;
+   }
+
    async createNewIfNotExists(tgID: number, language: Language) {
       const candidate = await this.userModel.findOne({ tgID });
       if (candidate) return candidate;

@@ -1,5 +1,6 @@
 import languageButtons from './language.buttons';
 import menuButtons from './menu.buttons';
-import playMenuButtons from './playMenu.buttons';
+import playChoiceButtons from './playChoice.buttons';
 
-export { menuButtons, languageButtons, playMenuButtons };
+export * from './game.buttons';
+export { menuButtons, languageButtons, playChoiceButtons };

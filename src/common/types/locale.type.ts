@@ -3,6 +3,7 @@ export type LocaleLanguage = {
    menu: string;
    language: string;
    chooseLanguage: string;
+   chooseGameOption: string;
    somethingWrong: string;
    changeLanguageSuccess: string;
    totalGamesCount: string;
@@ -12,10 +13,16 @@ export type LocaleLanguage = {
    draws: string;
    playMenuChoice: string;
    cancel: string;
-   pleaseSendGameID: string;
-   gameRoomCreated: string;
+   iChallengeU: string;
+   cannotBeDenied: string;
+   challengeDenied: string;
 
-   buttonNewGame: string;
+   inlineQueryTitle: string;
+   inlineQueryDescription: string;
+
+   buttonAccept: string;
+   buttonDeny: string;
+   buttonPlayWithFriend: string;
    buttonMyStats: string;
    buttonPlay: string;
    buttonChangeLang: string;

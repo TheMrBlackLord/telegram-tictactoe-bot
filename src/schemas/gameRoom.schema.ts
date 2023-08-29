@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Field, Opponents } from '../common/types';
+import { Field, Language, Opponents } from '../common/types';
+import { generateEmptyField } from '../common/utils';
 
 export type GameRoomDocument = HydratedDocument<GameRoom>;
 
@@ -14,10 +15,21 @@ export class GameRoom {
    @Prop({
       required: true
    })
-   gameID: number;
+   initiatorID: number;
 
    @Prop({
       required: true
+   })
+   gameLanguage: Language;
+
+   @Prop({
+      required: true,
+      unique: true
+   })
+   messageID: string;
+
+   @Prop({
+      default: generateEmptyField
    })
    field: Field;
 }
