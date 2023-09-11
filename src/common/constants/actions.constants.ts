@@ -7,3 +7,4 @@ export const PLAY_WITH_RANDOM_ACTION = 'play_with_random';
 export const CANCEL_ACTION = 'cancel_play';
 export const ACCEPT_CHALLENGE_ACTION = 'accept_challenge';
 export const DENY_CHALLENGE_ACTION = 'DENY_challenge';
+export const FIELD_BUTTON_ACTION = 'field_button';

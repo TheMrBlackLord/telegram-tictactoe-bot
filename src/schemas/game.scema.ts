@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Chars, Field, Opponents } from '../common/types';
-import { Moves } from './moves.scema';
+import { Move } from './move.scema';
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -30,10 +30,10 @@ export class Game {
 
    @Prop({
       required: true,
-      type: Types.ObjectId,
-      ref: 'Moves'
+      type: Array<Types.ObjectId>,
+      ref: 'Move'
    })
-   moves: Moves;
+   moves: Move[];
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

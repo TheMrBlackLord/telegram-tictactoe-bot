@@ -1,3 +1,10 @@
-export const GAME_ID_LENGTH = 7;
+import { Chars } from '../types';
+
 export const INLINE_QUERY_ID = 'game_inline_query';
-export const THUMB_URL = 'https://cdn-icons-png.flaticon.com/512/1021/1021366.png';
+export const INLINE_PHOTO_ID =
+   'AgACAgIAAxkDAAO2ZP9MJvT7xSZSHvAmc-m3h8ZXVyoAAhPOMRuYUPlLH9zcQlQvYV0BAAMCAANtAAMwBA';
+export const buttonValues: Record<Chars | '', string> = {
+   '': '⬜',
+   x: '❌',
+   o: '⭕'
+};

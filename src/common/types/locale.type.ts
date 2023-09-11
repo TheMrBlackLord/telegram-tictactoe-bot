@@ -9,16 +9,17 @@ export type LocaleLanguage = {
    totalGamesCount: string;
    winPercentage: string;
    wins: string;
+   winner: string;
    defeats: string;
    draws: string;
    playMenuChoice: string;
    cancel: string;
    iChallengeU: string;
    cannotBeDenied: string;
+   cannotBeAccepted: string;
    challengeDenied: string;
-
-   inlineQueryTitle: string;
-   inlineQueryDescription: string;
+   notYourMove: string;
+   cellIsNotEmpty: string;
 
    buttonAccept: string;
    buttonDeny: string;

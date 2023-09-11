@@ -19,14 +19,16 @@ export const LOCALE: Record<Language, LocaleLanguage> = {
       playMenuChoice: 'You can start a new game by clicking the button below or write me the ID of an already created game',
       buttonPlayWithFriend: 'Play with a friend',
       cancel: 'Cancel',
-      inlineQueryTitle: 'Challenge a friend',
-      inlineQueryDescription: 'Click here to play with a friend',
       iChallengeU: 'I challenge you in tic tac toe',
       buttonAccept: 'Accept',
       chooseGameOption: 'Choose a game option',
       buttonDeny: 'Deny',
       cannotBeDenied: "It's impossible to deny, because you're the initiator of the game",
-      challengeDenied: 'Challenge denied'
+      challengeDenied: 'Challenge denied',
+      cannotBeAccepted: "It's impossible to accept, because you're the initiator of the game",
+      notYourMove: "It's not your turn now",
+      cellIsNotEmpty: 'This cell is not empty',
+      winner: 'Winner'
    },
    russian: {
       hello: ['Привет,', 'добро пожаловать в'],
@@ -46,13 +48,15 @@ export const LOCALE: Record<Language, LocaleLanguage> = {
       playMenuChoice: 'Ты можешь начать новую игру, нажав кнопку ниже или написать мне айди уже созданной игры',
       buttonPlayWithFriend: 'Играть с другом',
       cancel: 'Отмена',
-      inlineQueryTitle: 'Брось вызов другу',
-      inlineQueryDescription: 'Нажми сюда, чтобы играть с другом',
       iChallengeU: 'Я бросаю тебе вызов в крестики нолики',
       buttonAccept: 'Принять',
       chooseGameOption: 'Выбери вариант игры',
       buttonDeny: 'Отклонить',
       cannotBeDenied: 'Невозможно отклонить, потому что ты инициатор игры',
-      challengeDenied: 'Вызов отклонен'
+      challengeDenied: 'Вызов отклонен',
+      cannotBeAccepted: 'Невозможно принять, потому что ты инициатор игры',
+      notYourMove: 'Сейчас не ваш ход',
+      cellIsNotEmpty: 'Эта клетка не пуста',
+      winner: 'Победитель'
    }
 };

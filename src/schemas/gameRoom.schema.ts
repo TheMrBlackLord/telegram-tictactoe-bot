@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Field, Language, Opponents } from '../common/types';
+import { Chars, Field, Language, Opponents } from '../common/types';
 import { generateEmptyField } from '../common/utils';
+import { Types } from 'mongoose';
+import { Move } from './move.scema';
 
 export type GameRoomDocument = HydratedDocument<GameRoom>;
 
@@ -11,6 +13,18 @@ export class GameRoom {
       required: true
    })
    opponents: Opponents;
+
+   @Prop({
+      default: 'x'
+   })
+   currentMove: Chars;
+
+   @Prop({
+      type: Array<Types.ObjectId>,
+      ref: 'Move',
+      default: []
+   })
+   moves: Move[];
 
    @Prop({
       required: true

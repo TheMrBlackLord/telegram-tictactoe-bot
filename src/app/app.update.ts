@@ -1,11 +1,12 @@
 import { Update, Start, Ctx, Command, Action, On } from 'nestjs-telegraf';
-import { InlineQueryResultArticle } from 'telegraf/typings/core/types/typegram';
+import { InlineQueryResultArticle, InlineQueryResultCachedPhoto, InlineQueryResultPhoto } from 'telegraf/typings/core/types/typegram';
 import {
    menuButtons,
    languageButtons,
    acceptButton,
    playChoiceButtons,
-   denyButton
+   denyButton,
+   fieldButtons
 } from '../common/buttons';
 import {
    MENU_COMMAND,
@@ -16,9 +17,10 @@ import {
    PLAY_COMMAND,
    PLAY_ACTION,
    INLINE_QUERY_ID,
-   THUMB_URL,
    ACCEPT_CHALLENGE_ACTION,
-   DENY_CHALLENGE_ACTION
+   DENY_CHALLENGE_ACTION,
+   FIELD_BUTTON_ACTION,
+   INLINE_PHOTO_ID
 } from '../common/constants';
 import { TelegrafContext, TelegrafContextCallbackQuery } from '../common/context';
 import { Locale } from '../common/decorators';
@@ -28,7 +30,11 @@ import {
    helloString,
    statsString,
    languageGuard,
-   changeLangSuccessString
+   changeLangSuccessString,
+   gameUpdateString,
+   checkWinner,
+   createResultImage,
+   gameFinishedString
 } from '../common/utils';
 import { UserService } from '../user/user.service';
 import { Context } from 'telegraf';
@@ -75,27 +81,79 @@ export class AppUpdate {
    }
 
    @Action(ACCEPT_CHALLENGE_ACTION)
-   async onAcceptChallenge(
-      @Ctx() ctx: TelegrafContextCallbackQuery
-      // @Locale() locale: LocaleLanguage
-   ) {
-      await ctx.reply('accepted');
-   }
-
-   @Action(DENY_CHALLENGE_ACTION)
-   async onDenyChallenge(@Ctx() ctx: Context) {
-      const language = await this.userService.getLanguage(ctx.from.id);
-      const result = await this.gameService.denyChallenge(
-         ctx.from.id,
+   async onAcceptChallenge(@Ctx() ctx: Context) {
+      const { language, payload } = await this.gameService.acceptChallenge(
+         ctx.from,
          ctx.inlineMessageId
       );
-      if (typeof result === 'string') {
-         await ctx.answerCbQuery(LOCALE[language][result as string]);
+      if (typeof payload === 'string') {
+         await ctx.answerCbQuery(LOCALE[language][payload as string]);
          return;
       }
 
       await ctx.answerCbQuery();
-      await ctx.editMessageText(`🤷‍♂️ ${LOCALE[result.language].challengeDenied}`);
+      await ctx.editMessageText(gameUpdateString(payload), {
+         reply_markup: {
+            inline_keyboard: fieldButtons(payload.field)
+         },
+         parse_mode: 'HTML',
+         disable_web_page_preview: true
+      });
+   }
+
+   @Action(DENY_CHALLENGE_ACTION)
+   async onDenyChallenge(@Ctx() ctx: Context) {
+      const { language, errorProperty } = await this.gameService.denyChallenge(
+         ctx.from.id,
+         ctx.inlineMessageId
+      );
+      if (errorProperty) {
+         await ctx.answerCbQuery(LOCALE[language][errorProperty as string]);
+         return;
+      }
+
+      await ctx.answerCbQuery();
+      await ctx.editMessageText(`🤷‍♂️ ${LOCALE[language].challengeDenied}`);
+   }
+
+   @Action(new RegExp(`${FIELD_BUTTON_ACTION}_\\d{2}`, 'g'))
+   async onMove(@Ctx() ctx: TelegrafContextCallbackQuery) {
+      const data = ctx.update.callback_query.data;
+      const y = +data.at(-2);
+      const x = +data.at(-1);
+      const { language, payload } = await this.gameService.move(
+         ctx.from.id,
+         ctx.inlineMessageId,
+         { x, y }
+      );
+      if (typeof payload === 'string') {
+         await ctx.answerCbQuery(LOCALE[language][payload as string]);
+         return;
+      }
+
+      const winner = checkWinner(payload.field);
+
+      await ctx.answerCbQuery();
+      if (winner) {
+         await ctx.editMessageMedia({
+            media: {
+               source: await createResultImage([])
+            },
+            type: 'photo'
+         });
+         await ctx.editMessageText(gameFinishedString(payload, winner), {
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+         });
+      } else {
+         await ctx.editMessageText(gameUpdateString(payload), {
+            reply_markup: {
+               inline_keyboard: fieldButtons(payload.field)
+            },
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+         });
+      }
    }
 
    @Action(CHANGE_LANGUAGE_ACTION)
@@ -138,25 +196,27 @@ export class AppUpdate {
 
    @On('inline_query')
    async onInlineQuery(@Ctx() ctx: Context) {
-      const language = await this.userService.getLanguage(
-         ctx.inlineQuery.from.id
-      );
-      const result: InlineQueryResultArticle = {
-         type: 'article',
+      const language = await this.userService.getLanguage(ctx.inlineQuery.from.id);
+      const result: InlineQueryResultCachedPhoto = {
+         type: 'photo',
          id: INLINE_QUERY_ID,
-         title: `⚔️ ${LOCALE[language].inlineQueryTitle}`,
-         description: `${LOCALE[language].inlineQueryDescription}`,
-         thumb_url: THUMB_URL,
-         input_message_content: {
-            message_text: `⚔️ ${LOCALE[language].iChallengeU}`
-         },
+         caption: `⚔️ ${LOCALE[language].iChallengeU}`,
          reply_markup: {
             inline_keyboard: [[acceptButton(language), denyButton(language)]]
-         }
+         },
+         photo_file_id: INLINE_PHOTO_ID
       };
       ctx.answerInlineQuery([result], {
          cache_time: 120
       });
+   }
+
+   @Command('ph')
+   async a(ctx: TelegrafContext) {
+      const a = await ctx.replyWithPhoto({
+         source: await createResultImage([])
+      });
+      console.log(a);
    }
 
    @On('chosen_inline_result')
