@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 import { Chars, Field, Language, Opponents } from '../common/types';
 import { generateEmptyField } from '../common/utils';
 import { Types } from 'mongoose';
-import { Move } from './move.scema';
+import { Move } from './move.schema';
 
 export type GameRoomDocument = HydratedDocument<GameRoom>;
 
@@ -25,6 +25,9 @@ export class GameRoom {
       default: []
    })
    moves: Move[];
+
+   @Prop()
+   startTime: number;
 
    @Prop({
       required: true

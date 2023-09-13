@@ -25,27 +25,24 @@ import {
 import { TelegrafContext, TelegrafContextCallbackQuery } from '../common/context';
 import { Locale } from '../common/decorators';
 import { LOCALE } from '../common/locale';
-import { Language, LocaleLanguage } from '../common/types';
+import { GameResult, Language, LocaleLanguage } from '../common/types';
 import {
    helloString,
    statsString,
    languageGuard,
    changeLangSuccessString,
    gameUpdateString,
-   checkWinner,
-   createResultImage
+   gameFinishedString
 } from '../common/utils';
 import { UserService } from '../user/user.service';
 import { Context } from 'telegraf';
 import { GameService } from '../game/game.service';
-import { ImgurService } from '../imgur/imgur.service';
 
 @Update()
 export class AppUpdate {
    constructor(
       private readonly userService: UserService,
-      private readonly gameService: GameService,
-      private readonly imgurService: ImgurService
+      private readonly gameService: GameService
    ) {}
 
    // ========= COMMAND HANDLERS =========
@@ -132,16 +129,21 @@ export class AppUpdate {
          return;
       }
 
-      const winner = checkWinner(payload.field);
+      let gameResult: GameResult;
+      if (payload.moves.length > 4) {
+         gameResult = this.gameService.checkWinner(payload.field);
+      }
 
-      if (winner) {
-         const img = await createResultImage(payload.moves);
-         // this.imgurService.upload(img);
-         // const media = Input.fromReadableStream(img);
-         // await ctx.editMessageMedia({
-         //    media,
-         //    type: 'photo'
-         // });
+      if (gameResult) {
+         const fileLink = await this.gameService.finishGame(gameResult, payload);
+         await ctx.editMessageMedia({
+            media: fileLink,
+            type: 'photo'
+         });
+         await ctx.editMessageText(gameFinishedString(payload, gameResult.winner), {
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+         });
       } else {
          await ctx.editMessageText(gameUpdateString(payload), {
             reply_markup: {
@@ -207,14 +209,6 @@ export class AppUpdate {
       ctx.answerInlineQuery([result], {
          cache_time: 120
       });
-   }
-
-   @Command('ph')
-   async a(ctx: TelegrafContext) {
-      const a = await ctx.replyWithPhoto({
-         source: await createResultImage([])
-      });
-      console.log(a);
    }
 
    @On('chosen_inline_result')

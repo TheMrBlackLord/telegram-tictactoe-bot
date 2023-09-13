@@ -7,7 +7,11 @@ export class ImgurService {
    constructor(@Inject(IMGUR_CLIENT) private readonly imgurClient: ImgurClient) {}
 
    async upload(image: ReadableStream | Buffer) {
-      const response = await this.imgurClient.upload({ image });
-      console.log(response);
+      try {
+         const response = await this.imgurClient.upload({ image });
+         return response.data.link;
+      } catch (_) {
+         return null;
+      }
    }
 }

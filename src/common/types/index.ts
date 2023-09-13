@@ -6,3 +6,4 @@ export * from './opponents.type';
 export * from './chars.type';
 export * from './player.type';
 export * from './imgur.type';
+export * from './gameResult.type';
