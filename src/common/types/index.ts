@@ -5,3 +5,4 @@ export * from './field.type';
 export * from './opponents.type';
 export * from './chars.type';
 export * from './player.type';
+export * from './imgur.type';

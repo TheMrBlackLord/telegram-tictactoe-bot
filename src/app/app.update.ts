@@ -1,5 +1,5 @@
 import { Update, Start, Ctx, Command, Action, On } from 'nestjs-telegraf';
-import { InlineQueryResultArticle, InlineQueryResultCachedPhoto, InlineQueryResultPhoto } from 'telegraf/typings/core/types/typegram';
+import { InlineQueryResultCachedPhoto } from 'telegraf/typings/core/types/typegram';
 import {
    menuButtons,
    languageButtons,
@@ -33,18 +33,19 @@ import {
    changeLangSuccessString,
    gameUpdateString,
    checkWinner,
-   createResultImage,
-   gameFinishedString
+   createResultImage
 } from '../common/utils';
 import { UserService } from '../user/user.service';
 import { Context } from 'telegraf';
 import { GameService } from '../game/game.service';
+import { ImgurService } from '../imgur/imgur.service';
 
 @Update()
 export class AppUpdate {
    constructor(
       private readonly userService: UserService,
-      private readonly gameService: GameService
+      private readonly gameService: GameService,
+      private readonly imgurService: ImgurService
    ) {}
 
    // ========= COMMAND HANDLERS =========
@@ -133,18 +134,14 @@ export class AppUpdate {
 
       const winner = checkWinner(payload.field);
 
-      await ctx.answerCbQuery();
       if (winner) {
-         await ctx.editMessageMedia({
-            media: {
-               source: await createResultImage([])
-            },
-            type: 'photo'
-         });
-         await ctx.editMessageText(gameFinishedString(payload, winner), {
-            parse_mode: 'HTML',
-            disable_web_page_preview: true
-         });
+         const img = await createResultImage(payload.moves);
+         // this.imgurService.upload(img);
+         // const media = Input.fromReadableStream(img);
+         // await ctx.editMessageMedia({
+         //    media,
+         //    type: 'photo'
+         // });
       } else {
          await ctx.editMessageText(gameUpdateString(payload), {
             reply_markup: {
@@ -154,6 +151,7 @@ export class AppUpdate {
             disable_web_page_preview: true
          });
       }
+      await ctx.answerCbQuery();
    }
 
    @Action(CHANGE_LANGUAGE_ACTION)

@@ -7,6 +7,8 @@ import RedisSession from 'telegraf-session-redis';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { UserModule } from '../user/user.module';
 import { GameModule } from '../game/game.module';
+import { ImgurModule } from '../imgur/imgur.module';
+import { ImgurModuleOptions } from '../common/types';
 
 const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
 
@@ -38,6 +40,19 @@ const envFilePath = path.join('envs', `.${process.env.NODE_ENV}.env`);
                }
             });
             return { token, middlewares: [session] };
+         }
+      }),
+      ImgurModule.forRootAsync({
+         isGlobal: true,
+         imports: [ConfigModule],
+         inject: [ConfigService],
+         useFactory(configService: ConfigService): ImgurModuleOptions {
+            const clientId = configService.getOrThrow<string>('IMGUR_ID');
+            const clientSecret = configService.getOrThrow<string>('IMGUR_SECRET');
+            return {
+               clientId,
+               clientSecret
+            };
          }
       }),
       UserModule,
